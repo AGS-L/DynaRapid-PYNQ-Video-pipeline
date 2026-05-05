@@ -1,0 +1,3 @@
+[submodule "tools/DynaRapid"]
+	path = tools/DynaRapid
+	url = https://github.com/AGS-L/DynaRapid

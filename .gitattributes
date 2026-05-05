@@ -1,0 +1,11 @@
+# Always keep .sh files LF
+*.sh text eol=lf
+
+# Force dynamatic tcl to be LF
+c_code/synthesis.tcl text eol=lf
+
+# Always keep .bat files CRLF
+*.bat text eol=crlf
+
+# Auto detect text files and perform LF normalization
+* text=auto

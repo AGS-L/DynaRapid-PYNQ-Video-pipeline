@@ -1,0 +1,16 @@
+Digraph G {
+	splines=spline;
+//DHLS version: 0.1.1" [shape = "none" pos = "20,20!"]
+		"pixel1" [type = "Entry", bbID= 1, in = "in1:32", out = "out1:32"];
+		"ret_0" [type = "Operator", bbID= 1, op = "ret_op", in = "in1:32 ", out = "out1:32 ", delay="1.412 1.409 0.000 100.000 100.000 100.000 100.000 100.000", latency=0, II=1];
+		"end_0" [type = "Exit", bbID= 0, in = "in1:32 ", out = "out1:32"];
+		"start_0" [type = "Entry", control= "true", bbID= 1, in = "in1:0", out = "out1:0"];
+		"sink_0" [type = "Sink", bbID= 0, in = "in1:0"];
+	subgraph cluster_0 {
+	color = "darkgreen";
+		label = "block1";
+		"pixel1" -> "ret_0" [color = "red", from = "out1", to = "in1"];
+		"ret_0" -> "end_0" [color = "red", from = "out1", to = "in1"];
+		"start_0" -> "sink_0" [color = "gold3", from = "out1", to = "in1"];
+	}
+}

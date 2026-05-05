@@ -1,0 +1,13 @@
+*.log
+*.dmp
+vivado*.jou
+vivado_pid*.str
+clockInfo.txt
+tight_setup_hold_pins.txt
+.Xil/
+c_code/hdl/
+c_code/reports/
+c_code/*.s
+
+pynq_base/base/filters/tmp/
+pynq_base/base/filters/**/filter_bitstream.dcp
