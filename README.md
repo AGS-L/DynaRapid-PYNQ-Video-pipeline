@@ -6,7 +6,7 @@ This repository contains a set of files to test and generate single pixel video 
 
 ### Reference design
 
-This design is based on the base overlay provided with the AUP-ZU3 which can be found at [https://github.com/Xilinx/AUP-ZU3](https://github.com/Xilinx/AUP-ZU3). This design was however adapted to work with Vivado 2024.2 rather than 2024.1.
+This design is based on the base overlay provided with the AUP-ZU3 which can be found at <https://github.com/Xilinx/AUP-ZU3>. This design was however adapted to work with Vivado 2024.2 rather than 2024.1.
 
 
 ## Required Material
@@ -18,32 +18,26 @@ This design is based on the base overlay provided with the AUP-ZU3 which can be 
 
 
 
-## Quick Setup
+## Usage
 
-This repository contains the files to generate a bistream as well as pre-compiled bitstreams ready to be tested on the AUP-ZU3 board. To test the pre-compiled bitstreams you can skip the step 3.
+This repository contains the files to generate a bitstream, as well as precompiled bitstreams ready to be tested on the AUP-ZU3 board. To test the precompiled bitstreams, skip step 3. If you want to regenerate bitstreams on your machine, execute all steps below in order:
 
-### Hardware Setup
-
-Follow the instructions provided in [https://github.com/Xilinx/AUP-ZU3](https://github.com/Xilinx/AUP-ZU3). The hardware setup will look like the following one.
-
-![drawing](images/AUP-ZU3-camera_setup.jpg)
-
-If you want to re-generate bitstreams on your machine, execute all steps below in order.
-
-1. Project Setup
+1. Project & Hardware Setup
 2. Filter Selection
 3. Bitstream Generation
-3. File Transfer to Board
-4. Run Example on Board
+4. File Transfer to Board
+5. Run Example on Board
 
 
 
 ## Steps
 
-### 1. Project Setup
+### 1. Project & Hardware Setup
 
 - Clone the repo with `git clone --recurse-submodules https://github.com/AGS-L/DynaRapid-PYNQ-Video-pipeline.git`
-- Follow <https://xilinx.github.io/AUP-ZU3/getting_started.html> to set up the hardware
+- Follow <https://xilinx.github.io/AUP-ZU3/getting_started.html> to set up the hardware. The result should resemble the following:
+
+![Hardware Setup](./images/AUP-ZU3-camera_setup.jpg)
 
 ### 2. Filter Selection
 
@@ -57,41 +51,35 @@ In the folder [`pynq_base/base/filters/`](./pynq_base/base/filters/), you may se
 
 ### 3. Bitstream Generation
 
-If you wish to regenerate a bitstream, you can run the following command to run the DynaRapid flow:
+If you wish to regenerate a bitstream, you can run the following command in the `pynq_base/base/` folder to execute the DynaRapid flow:
 
-Windows:
+- Windows:
+    ```bat
+    run_generate_bitstream.bat <filterName>
+    ```
 
-```bat
-run_generate_bitstream.bat <filterName>
-```
+    For Windows only: Adapt the `VIVADO_INSTALL` variable in the `run_generate_bitstream.bat` script according to your setup.
+- Linux:
+    ```sh
+    ./run_generate_bitstream.sh <filter_name>
+    ```
 
-For Windows only: Adapt the `VIVADO_INSTALL` variable in the `run_generate_bitstream.bat` script according to your setup.
-
-Linux:
-
-```sh
-./run_generate_bitstream.sh <filter_name>
-```
-
-The argument `filter_name` specifies in which subfolder of [`pynq_base/base/filters/`](./pynq_base/base/filters/) to look for the DOT file `filter.dot`.
+    The argument `filter_name` specifies in which subfolder of [`pynq_base/base/filters/`](./pynq_base/base/filters/) to look for the DOT file `filter.dot`.
 
 ### 4. File Transfer to Board
 
-A script is provided to easily transfer relevant files to the board. Once the board has booted, run the following command:
+A script is provided to easily transfer relevant files to the board. Once the board has booted, run the following command in the `pynq_base/base/` folder:
 
-Windows:
+- Windows:
+    ```bat
+    send_files_2_board.bat <filter_name> <send_notebooks>
+    ```
+- Linux:
+    ```sh
+    ./send_files_2_board.sh <filter_name> <send_notebooks>
+    ```
 
-```bat
-send_files_2_board.bat <filter_name> <send_notebooks>
-```
-
-Linux:
-
-```sh
-./send_files_2_board.sh <filter_name> <send_notebooks>
-```
-
-After running this command you will be prompted for the password (`xilinx`).
+After running this command you will be prompted for the password for the AUP-ZU3 (default password is `xilinx`).
 
 The argument `filter_name` is what will be used in the python notebook to reference the bitstream. The example notebooks uses `passthrough` by default.
 
@@ -103,11 +91,11 @@ Open the [`dynarapid_single_pixel_filter.ipynb`](./pynq_base/base/notebook_examp
 
 In the `Filter Selection` cell you can edit which filter you want to run. Execute the cells in the same order they are defined. If you don't have a DisplayPort monitor connected to the board, you can skip the cells related to the DisplayPort output.
 
-### Example output
+### Example Output
 
-The figure illustrates the output produced by one of the filters (negative). The video pipeline operates at a frame rate of 30 fps, showing smooth and consistent processing of DynaRapid-generated video filter.
+The figure illustrates the output produced by one of the filters (negative). The video pipeline operates at a frame rate of 30 FPS, showing smooth and consistent processing of DynaRapid-generated video filter.
 
-![drawing](images/filter.png)
+![Example Output](./images/filter.png)
 
 
 ### Custom Filters
@@ -121,23 +109,23 @@ If you decide to edit any of the existing filters or add a custom one, there is 
 
 ### From Spec-to-Circuit - Interaction with Agentic AI
 
-All filters were generated using publicly available generative AI tools. Ongoing work on generating such filters directly from English specifications (Spec-to-Circuit) has already been tested and will be released soon as part of this work [1]. Several work on agentic-AI interaction is currently in progress.
+All filters were generated using publicly available generative AI tools. Ongoing work on generating such filters directly from English specifications (Spec-to-Circuit) has already been tested and will be released soon as part of this work [1]. Several projects on agentic AI interaction are currently in progress.
 
-Please do not hesitate to get in touch in case you have any further interest on this feature.
+Please do not hesitate to get in touch in case you have any further interest in this feature.
 
 
 ### Convolutional Filters
 
 Convolutional filters have already been developed and tested, and will be included in a forthcoming commit of this work.
 
-Please do not hesitate to get in touch in case you have any further interest on this feature.
+Please do not hesitate to get in touch in case you have any further interest in this feature.
 
 
 ### Dynamic Partial Reconfiguration Support
 
-A preliminary flow that includes the dynamic-partial reconfiguration has been already tested and is currently in development. 
+A preliminary flow that includes dynamic partial reconfiguration has already been tested and is currently in development. 
 
-Please do not hesitate to get in touch in case you have any further interest on this feature.
+Please do not hesitate to get in touch in case you have any further interest in this feature.
 
 
 
@@ -160,13 +148,13 @@ If you would like to use this work, please cite the associated talks, papers, an
 
 ## Contact
 
-For any question please feel free to reach out 
+For any questions, please feel free to reach out to:
 
-andrea.guerrieri@hevs.ch
+<andrea.guerrieri@hevs.ch>
 
 
 ## License
 
 Copyright 2026 - Adaptive Heterogeneous Systems Lab, HES-SO University of Applied Sciences and Arts Western Switzerland, Engineering and Architecture Department
 
-For any usage please see [LICENSE.txt](./LICENSE.txt).
+For any usage, please see [LICENSE.txt](./LICENSE.txt).
