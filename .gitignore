@@ -11,3 +11,4 @@ c_code/*.s
 
 pynq_base/base/filters/tmp/
 pynq_base/base/filters/**/filter_bitstream.dcp
+pynq_base/base/filters/**/filter_modified.dot

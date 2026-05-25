@@ -2,7 +2,7 @@
 
 ## Description
 
-This repository contains a set of files to test and generate single pixel video filters using DynaRapid for the PYNQ video pipeline, running on the AUP-ZU3 board.
+This repository contains a set of files to test and generate 3x3 pixel video filters using DynaRapid for the PYNQ video pipeline, running on the AUP-ZU3 board.
 
 ### Reference design
 
@@ -12,7 +12,7 @@ This design is based on the base overlay provided with the AUP-ZU3 which can be 
 ## Required Material
 
 - Vivado 2024.2 (other versions might work, but not guaranteed)
-- Java version capable of running DynaRapid (OpenJDK 11 works)
+- JDK capable of running DynaRapid (OpenJDK 11 works)
 - [Digilent Pcam 5C Camera](https://reference.digilentinc.com/reference/add-ons/pcam-5c/start)
 - External Display with a DisplayPort connection
 
@@ -43,11 +43,18 @@ This repository contains the files to generate a bitstream, as well as precompil
 
 In the folder [`pynq_base/base/filters/`](./pynq_base/base/filters/), you may select one of the following filters:
 
-- `blue`: Isolates the blue color channel
-- `green`: Isolates the green color channel
-- `red`: Isolates the red color channel
-- `negative`: Inverts the colors
-- `passthrough`: No filtering; the video feed is passed through unchanged
+- Single pixel filters:
+    - `blue`: Isolates the blue color channel
+    - `green`: Isolates the green color channel
+    - `red`: Isolates the red color channel
+    - `gray`: Converts the video feed to grayscale
+    - `negative`: Inverts the colors
+    - `passthrough`: No filtering; the video feed is passed through unchanged
+- 3x3 kernel filters:
+    - `emboss`: Applies an emboss effect, giving the image a raised, sculptural appearance
+    - `gauss`: Applies a Gaussian blur, smoothing the image by reducing noise and detail
+    - `laplace`: Applies the Laplacian operator, highlighting edges and regions of rapid intensity change
+    - `sharpen`: Enhances edges and fine details, making the image appear crisper
 
 ### 3. Bitstream Generation
 
@@ -87,7 +94,7 @@ If you wish to send the notebook to the board (which you will need to do the fir
 
 ### 5. Run Example on Board
 
-Open the [`dynarapid_single_pixel_filter.ipynb`](./pynq_base/base/notebook_examples/video/dynarapid_single_pixel_filter.ipynb) notebook on the board.
+Open the [`dynarapid_pixel_filter.ipynb`](./pynq_base/base/notebook_examples/video/dynarapid_pixel_filter.ipynb) notebook on the board.
 
 In the `Filter Selection` cell you can edit which filter you want to run. Execute the cells in the same order they are defined. If you don't have a DisplayPort monitor connected to the board, you can skip the cells related to the DisplayPort output.
 
@@ -110,13 +117,6 @@ If you decide to edit any of the existing filters or add a custom one, there is 
 ### From Spec-to-Circuit - Interaction with Agentic AI
 
 All filters were generated using publicly available generative AI tools. Ongoing work on generating such filters directly from English specifications (Spec-to-Circuit) has already been tested and will be released soon as part of this work [1]. Several projects on agentic AI interaction are currently in progress.
-
-Please do not hesitate to get in touch in case you have any further interest in this feature.
-
-
-### Convolutional Filters
-
-Convolutional filters have already been developed and tested, and will be included in a forthcoming commit of this work.
 
 Please do not hesitate to get in touch in case you have any further interest in this feature.
 

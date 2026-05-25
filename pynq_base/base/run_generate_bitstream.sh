@@ -38,11 +38,17 @@ TOOLS_DIR="$ROOT_DIR/tools"
 DYNARAPID_INSTALL="$TOOLS_DIR/DynaRapid"
 
 # Folder where .dot files are found
-DOT_FILE_FOLDER="$SCRIPT_DIR/filters/$FILTER_NAME"
+OUTPUT_FOLDER="$SCRIPT_DIR/filters/$FILTER_NAME"
 
 # Check if the folder exists
-if [[ ! -d "$DOT_FILE_FOLDER/" ]]; then
-    echo -e "${RED}[ERROR] Folder '$DOT_FILE_FOLDER/' not found${RESET}"
+if [[ ! -d "$OUTPUT_FOLDER/" ]]; then
+    echo -e "${RED}[ERROR] Folder '$OUTPUT_FOLDER/' not found${RESET}"
+    exit 1
+fi
+
+# Check if file present
+if [[ ! -f "$OUTPUT_FOLDER/filter.dot" ]]; then
+    echo -e "${RED}[ERROR] Failed to find DFG '$OUTPUT_FOLDER/filter.dot'${RESET}"
     exit 1
 fi
 
@@ -52,16 +58,27 @@ cd "$DYNARAPID_INSTALL"
 rm -rf "$C_CODE_FOLDER/designs/filter"
 
 # Run DynaRapid
-./gradlew :GenerateDesign --args="-f $DOT_FILE_FOLDER/filter.dot -placer greedy -part xczu3eg"
+./gradlew :GenerateDesign --args="-f $OUTPUT_FOLDER/filter.dot -placer greedy -part xczu3eg -noClock -region 0 -targetPeriod 3 -streaming"
 
 # Check if DynaRapid was successful
 # Currently DynaRapid doesn't return an error code, so only way to check if successful is if output was created; check when moving
-mv "$DYNARAPID_INSTALL/designs/filter/filter_routed.dcp" "$DOT_FILE_FOLDER/filter_routed.dcp"
+mv "$DYNARAPID_INSTALL/designs/filter/filter_routed.dcp" "$OUTPUT_FOLDER/filter_routed1.dcp"
+
+# Save modified dot file, if it has been modified
+if ! cmp -s "$DYNARAPID_INSTALL/designs/filter/filter.dot" "$OUTPUT_FOLDER/filter.dot"; then
+    mv "$DYNARAPID_INSTALL/designs/filter/filter.dot" "$OUTPUT_FOLDER/filter_modified.dot"
+fi
+
+rm -rf "$C_CODE_FOLDER/designs/filter"
+
+./gradlew :GenerateDesign --args="-f $OUTPUT_FOLDER/filter.dot -placer greedy -part xczu3eg -noClock -region 1 -targetPeriod 3 -streaming"
+
+mv "$DYNARAPID_INSTALL/designs/filter/filter_routed.dcp" "$OUTPUT_FOLDER/filter_routed2.dcp"
 
 cd "$SCRIPT_DIR"
 
 # Generate bitstream
 vivado -mode batch -source generate_bitstream.tcl -tclargs "$FILTER_NAME"
 
-echo -e "$GREEN[SUCCESS] Created bitstream and device tree blob for filter '$FILTER_NAME'$RESET"
+echo -e "$GREEN[SUCCESS] Created bitstream for filter '$FILTER_NAME'$RESET"
 )

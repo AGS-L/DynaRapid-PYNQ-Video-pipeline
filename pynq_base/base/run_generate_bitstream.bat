@@ -45,11 +45,11 @@ set "ROOT_DIR=%SCRIPT_DIR%\..\.."
 set "DYNARAPID_INSTALL=%ROOT_DIR%\tools\DynaRapid"
 
 @REM Folder where .dot files are found
-set "DOT_FILE_FOLDER=%SCRIPT_DIR%\filters\%FILTER_NAME%"
+set "OUTPUT_FOLDER=%SCRIPT_DIR%\filters\%FILTER_NAME%"
 
 @REM Check if the folder exists
-if not exist "%DOT_FILE_FOLDER%\" (
-    echo %RED%[ERROR] Folder "%DOT_FILE_FOLDER%\" not found%RESET%
+if not exist "%OUTPUT_FOLDER%\" (
+    echo %RED%[ERROR] Folder "%OUTPUT_FOLDER%\" not found%RESET%
     if /I %0 equ "%~f0" pause
     exit /b 1
 )
@@ -57,13 +57,13 @@ if not exist "%DOT_FILE_FOLDER%\" (
 @REM Print variable values
 echo ^> SCRIPT_DIR: "%SCRIPT_DIR%"
 echo ^> ROOT_DIR: "%ROOT_DIR%"
-echo ^> DOT_FILE_FOLDER: "%DOT_FILE_FOLDER%"
+echo ^> OUTPUT_FOLDER: "%OUTPUT_FOLDER%"
 echo ^> VIVADO_INSTALL: "%VIVADO_INSTALL%"
 echo ^> DYNARAPID_INSTALL: "%DYNARAPID_INSTALL%"
 
 @REM Check if file present
-if not exist "%DOT_FILE_FOLDER%\filter.dot" (
-    echo %RED%[ERROR] Failed to find DFG "%DOT_FILE_FOLDER%\filter.dot"%RESET%
+if not exist "%OUTPUT_FOLDER%\filter.dot" (
+    echo %RED%[ERROR] Failed to find DFG "%OUTPUT_FOLDER%\filter.dot"%RESET%
     if /I %0 equ "%~f0" pause
     exit /b 1
 )
@@ -76,14 +76,34 @@ if exist "%DYNARAPID_INSTALL%\designs\filter\" (
 )
 
 @REM Run DynaRapid; Gradle requires forward slashes for path
-call gradlew.bat :GenerateDesign --args="-f %DOT_FILE_FOLDER%/filter.dot -placer greedy -part xczu3eg"
+call gradlew.bat :GenerateDesign --args="-f %OUTPUT_FOLDER%/filter.dot -placer greedy -part xczu3eg -noClock -region 0 -targetPeriod 3 -streaming"
 
-move /y "%DYNARAPID_INSTALL%\designs\filter\filter_routed.dcp" "%DOT_FILE_FOLDER%\filter_routed.dcp" > NUL
+move /y "%DYNARAPID_INSTALL%\designs\filter\filter_routed.dcp" "%OUTPUT_FOLDER%\filter_routed1.dcp" > NUL
 
 @REM Check if DynaRapid was successful
 @REM Currently DynaRapid doesn't return an error code, so only way to check if successful is if output was created; check when moving
 if %errorlevel% neq 0 (
-    echo %RED%[ERROR] Failed run DynaRapid%RESET%
+    echo %RED%[ERROR] Failed run DynaRapid ^(1^)%RESET%
+    if /I %0 equ "%~f0" pause
+    exit /b 1
+)
+
+fc "%DYNARAPID_INSTALL%\designs\filter\filter.dot" "%OUTPUT_FOLDER%\filter.dot" > NUL
+
+@REM Save modified dot file, if it has been modified
+if %errorlevel% equ 1 (
+    move /y "%DYNARAPID_INSTALL%\designs\filter\filter.dot" "%OUTPUT_FOLDER%\filter_modified.dot" > NUL
+)
+
+@REM Clean-up previous run, to check for successful DynaRapid run
+rd /S /Q "%DYNARAPID_INSTALL%\designs\filter"
+
+call gradlew.bat :GenerateDesign --args="-f %OUTPUT_FOLDER%/filter.dot -placer greedy -part xczu3eg -noClock -region 1 -targetPeriod 3 -streaming"
+
+move /y "%DYNARAPID_INSTALL%\designs\filter\filter_routed.dcp" "%OUTPUT_FOLDER%\filter_routed2.dcp" > NUL
+
+if %errorlevel% neq 0 (
+    echo %RED%[ERROR] Failed to run DynaRapid ^(2^)%RESET%
     if /I %0 equ "%~f0" pause
     exit /b 1
 )
@@ -94,11 +114,11 @@ cd /d "%SCRIPT_DIR%"
 call "%VIVADO_INSTALL%" -mode batch -source generate_bitstream.tcl -tclargs "%FILTER_NAME%"
 
 if %errorlevel% neq 0 (
-    echo %RED%[ERROR] Failed to create bitstream%RESET%
+    echo %RED%[ERROR] Failed to create bitstream for filter '%FILTER_NAME%'%RESET%
     if /I %0 equ "%~f0" pause
     exit /b 1
 )
 
-echo %GREEN%[SUCCESS] Created bitstream%RESET%
+echo %GREEN%[SUCCESS] Created bitstream for filter '%FILTER_NAME%'%RESET%
 
 if /I %0 equ "%~f0" pause

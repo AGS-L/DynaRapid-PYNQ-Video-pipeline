@@ -44,11 +44,19 @@ set_param general.maxThreads $desired_threads
 set overlay_name "base"
 set circuit_name [lindex $argv 0]
 set output "./filters/${circuit_name}"
-set circuit_dcp "${output}/filter_routed.dcp"
+set circuit_dcp1 "${output}/filter_routed1.dcp"
 
 # Check if design exists
-if {![file exists $circuit_dcp]} {
-    puts "ERROR: Design couldn't be found at '${circuit_dcp}'"
+if {![file exists $circuit_dcp1]} {
+    puts "ERROR: Design 1 couldn't be found at '${circuit_dcp1}'"
+    return -code error
+}
+
+set circuit_dcp2 "${output}/filter_routed2.dcp"
+
+# Check if design exists
+if {![file exists $circuit_dcp2]} {
+    puts "ERROR: Design 2 couldn't be found at '${circuit_dcp2}'"
     return -code error
 }
 
@@ -63,12 +71,14 @@ if {![file exists $shell_dcp]} {
 # Load shell
 open_checkpoint $shell_dcp
 
-set accel_cell_name "base_i/mipi/dyna_accel_0/U0/dynarapid_accel"
+set accel1_cell_name "base_i/mipi/dyna_accel_1/inst/dynarapid_accel1"
+set accel2_cell_name "base_i/mipi/dyna_accel_1/inst/dynarapid_accel2"
 
-# Load and insert dynarapid circuit
-read_checkpoint -cell $accel_cell_name $circuit_dcp
+# Load and insert dynarapid circuits
+read_checkpoint -cell $accel1_cell_name $circuit_dcp1
+read_checkpoint -cell $accel2_cell_name $circuit_dcp2
 
-# Only routing is required between shell and circuit
+# Only routing is required between shell and circuits
 set_param general.maxThreads 2
 route_design
 set_param general.maxThreads $desired_threads
