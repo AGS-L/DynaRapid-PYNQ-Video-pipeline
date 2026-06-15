@@ -40,6 +40,8 @@ TEMP_FOLDER="$SCRIPT_DIR/filters/tmp/${FILTER_NAME}"
 mkdir -p "$TEMP_FOLDER"
 
 # Check if all files exist
+declare -ra FILES=("base.bit" "base.dtbo" "base.hwh" "base.py" "__init__.py")
+
 for file in "${FILES[@]}"; do
     if [[ ! -f "$FOLDER_NAME/$file" ]]; then
         echo -e "${RED}[ERROR] Source file '$FOLDER_NAME/$file' not found${RESET}"
